@@ -2,7 +2,7 @@
 
 一个用于排查 **OPPO 互联与 Clash / Mihomo TUN 网络冲突**的 Windows 小工具：自动找到需要处理的文件，你选择修复方式，确认后再修改，遇到问题可以恢复。
 
-**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9 测试版**
+**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9 发布版**
 
 ## 为什么做这个工具
 
@@ -27,7 +27,9 @@ Clash Verge Rev 的 [讨论 #6712](https://github.com/clash-verge-rev/clash-verg
 
 ## 下载和使用
 
-[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
+[**下载 v1.9 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9)
+
+Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下载：[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
 
 双击 EXE 即可运行，无需安装 Go 或 Python。程序未签名，Windows 可能显示“未知发布者”；修改受保护的安装目录时可能需要管理员权限。
 
