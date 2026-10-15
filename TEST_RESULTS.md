@@ -1,5 +1,26 @@
 # 测试结果与已知范围
 
+## v1.9.1（2026-10-15）
+
+| 检查 | 结果 |
+| --- | --- |
+| 业务回归 | 50 项顶层测试、31 个模糊测试种子通过，0 失败；1 项符号链接测试因 Token 权限不足跳过 |
+| 静态检查与构建 | go vet、Go 1.27.2 离线 Windows AMD64 GUI 构建通过，使用 -trimpath |
+| 发布 EXE 资源 | 通过 Windows 原生资源 API 读取；与源码 manifest 字节一致，requireAdministrator、uiAccess=false，PerMonitorV2 保留 |
+| Windows 实际启动规则 | 普通权限直接 CreateProcess 返回 ERROR_ELEVATION_REQUIRED（740），确认系统已识别管理员启动要求 |
+
+业务回归在普通权限的 asInvoker 测试资源下执行；随后生成 requireAdministrator 发布资源，构建最终 EXE 并独立执行 Windows 启动检查。除版本常量外，Go 业务代码未改动。记录见 [test-summary.json](verification/v1.9.1/test-summary.json) 和 [elevation.json](verification/v1.9.1/elevation.json)。本轮没有代替用户点击系统 UAC 授权窗口，也未操作真实 OPPO 文件、代理配置或执行重启。
+
+可在普通权限 PowerShell 中复现发布检查（仅开发验证需要 Python）：
+
+```powershell
+python source/tools/check_elevation.py '.\OPPO互联连接修复工具_v1.9.1.exe'
+```
+
+从当前发布源码运行 Go 测试时请使用管理员终端，因为测试 EXE 也会嵌入管理员启动声明。
+
+## v1.9 历史验证记录
+
 版本：v1.9 发布版。日期：2026-10-15。平台：Windows x64；Go 1.27.2；依赖通过 vendor 离线使用。
 
 ## 已完成验证

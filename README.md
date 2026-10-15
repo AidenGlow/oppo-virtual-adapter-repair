@@ -2,7 +2,7 @@
 
 一个用于排查 **OPPO 互联与 Clash / Mihomo TUN 网络冲突**的 Windows 小工具：自动找到需要处理的文件，你选择修复方式，确认后再修改，遇到问题可以恢复。
 
-**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9 发布版**
+**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9.1 发布版**
 
 ## 为什么做这个工具
 
@@ -27,11 +27,11 @@ Clash Verge Rev 的 [讨论 #6712](https://github.com/clash-verge-rev/clash-verg
 
 ## 下载和使用
 
-[**下载 v1.9 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9)
+[**下载 v1.9.1 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9.1)
 
-Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下载：[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
+Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下载：[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
 
-双击 EXE 即可运行，无需安装 Go 或 Python。程序未签名，Windows 可能显示“未知发布者”；修改受保护的安装目录时可能需要管理员权限。
+双击 EXE，Windows 会自动弹出管理员授权窗口，确认后进入界面，无需寻找右键菜单。取消授权则程序不启动；修改文件仍需在工具内最终确认。无需安装 Go 或 Python。
 
 1. **选择一种修复方式**，等待工具自动找到 OPPO 文件或代理客户端配置。
 2. DLL 方式先核对目录，并勾选手机已连接；配置方式先退出代理客户端，再扫描、选择实际联网的网卡。
@@ -56,6 +56,8 @@ Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下
 
 ## 测试到哪一步了
 
+- v1.9.1：50 项业务回归和 31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过；发布 EXE 的原生资源核对及 Windows 要求提权（错误 740）检查通过。
+
 - v1.9 回归：**50 项测试、31 个模糊测试种子通过，0 失败**；1 项符号链接测试因系统权限不足跳过。`go vet` 和离线 Windows x64 构建通过。
 - 额外用临时 YAML 完整跑通 **修复 → 自动查找备份 → 列表选择 → 最终确认 → 恢复**，包含实际文件写入；恢复后的字节和 SHA256 与原文件一致，恢复前保护备份也核对通过。
 - 真实手机连接、真实代理配置修改后的网络效果，以及全部 Windows / 客户端版本尚未联调验证。
@@ -64,13 +66,13 @@ Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下
 
 ## 从源码运行和编译
 
-采用 **Go + 原生 Win32 API**，依赖源码已放在 `source/vendor/`，可离线构建。在 Windows 安装 Go 1.23 或更新版本后：
+采用 **Go + 原生 Win32 API**，依赖源码已放在 `source/vendor/`，可离线构建。在 Windows 安装 Go 1.23 或更新版本后，在管理员终端执行测试和构建（测试 EXE 也包含提权声明）：
 
 ```powershell
 Set-Location 'source'
 go test -mod=vendor -count=1 ./...
 go vet -mod=vendor ./...
-go build -trimpath -mod=vendor -ldflags='-H windowsgui -s -w' -o '..\OPPO互联连接修复工具_v1.9.exe' .
+go build -trimpath -mod=vendor -ldflags='-H windowsgui -s -w' -o '..\OPPO互联连接修复工具_v1.9.1.exe' .
 ```
 
 本版实际使用 Go 1.27.2 构建；未使用 Go 1.23 工具链复测。发布构建使用 `-trimpath` 去除本机编译路径。修改 `app.manifest` 后先运行 `go generate .`。
