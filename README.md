@@ -1,5 +1,18 @@
 # OPPO互联占用虚拟网卡修复
 
+## Windows 用户下载提示
+
+> **Windows 10 / 11（64 位）用户，推荐直接下载：[Windows EXE（点击下载）](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/download/v1.9.2/oppo-virtual-adapter-repair-v1.9.2-windows-amd64.exe)。**
+>
+> 文件名：`oppo-virtual-adapter-repair-v1.9.2-windows-amd64.exe`。`amd64` 表示 x64 架构，Intel 和 AMD 的 64 位电脑都适用。
+>
+> 下载后双击 EXE，在 Windows 管理员授权窗口点击“是”即可运行。
+
+- **只想使用工具：** 下载上面的 `.exe` 即可。
+- **需要程序、源码和中文说明：** 下载[完整包 ZIP](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/download/v1.9.2/oppo-virtual-adapter-repair-v1.9.2-windows-amd64-full.zip)，解压后运行其中的 EXE。
+- **`SHA256.txt`：** 用于核对下载文件的完整性。
+- **`Source code (zip)` / `Source code (tar.gz)`：** GitHub 自动生成的源码包；直接使用工具请选择 EXE 或完整包。
+
 一个用于排查 **OPPO 互联与 Clash / Mihomo TUN 网络冲突**的 Windows 小工具：自动找到需要处理的文件，你选择修复方式，确认后再修改，遇到问题可以恢复。
 
 **Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9.2 发布版**
@@ -27,9 +40,7 @@ Clash Verge Rev 的 [讨论 #6712](https://github.com/clash-verge-rev/clash-verg
 
 ## 下载和使用
 
-[**下载 v1.9.1 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9.2)
-
-Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下载：[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
+普通 Windows 用户请使用首页顶部的 **Windows EXE 直接下载**入口。完整包和 SHA256 校验文件见 [v1.9.2 发布页面](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9.2)。
 
 双击 EXE，Windows 会自动弹出管理员授权窗口，确认后进入界面，无需寻找右键菜单。取消授权则程序不启动；修改文件仍需在工具内最终确认。无需安装 Go 或 Python。
 
