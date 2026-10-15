@@ -286,7 +286,9 @@ func renameAction(restore bool) {
 	}
 	result, e := changeDLL(dllPath, restore)
 	if e != nil {
-		alert("操作失败", e.Error(), errIcon)
+		detail := fileFailureMessage(e, modeDLL, source)
+		alert("操作失败", detail, errIcon)
+		text(statusText, detail)
 		return
 	}
 	useManualDLL(result)
@@ -577,8 +579,12 @@ func nicConfirm() {
 	}
 	backup, e := updateYaml(yamlPath, a.Name)
 	if e != nil {
-		alertFor(chooser, "操作未完成", e.Error(), errIcon)
-		text(statusText, "YAML 修复未完成："+e.Error())
+		detail := fileFailureMessage(e, modeYAML, yamlPath)
+		if backup != "" {
+			detail += "\n\n修改前备份：\n" + backup
+		}
+		alertFor(chooser, "操作未完成", detail, errIcon)
+		text(statusText, "YAML 修复未完成："+detail)
 		return
 	}
 	text(summaryText, "上次选择："+a.Name+"。再次修改仍需重新选择并确认。")

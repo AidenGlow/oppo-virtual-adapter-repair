@@ -2,7 +2,7 @@
 
 一个用于排查 **OPPO 互联与 Clash / Mihomo TUN 网络冲突**的 Windows 小工具：自动找到需要处理的文件，你选择修复方式，确认后再修改，遇到问题可以恢复。
 
-**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9.1 发布版**
+**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · 当前 v1.9.2 发布版**
 
 ## 为什么做这个工具
 
@@ -27,7 +27,7 @@ Clash Verge Rev 的 [讨论 #6712](https://github.com/clash-verge-rev/clash-verg
 
 ## 下载和使用
 
-[**下载 v1.9.1 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9.1)
+[**下载 v1.9.1 发布版（Windows 64 位）**](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/tag/v1.9.2)
 
 Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下载：[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.1_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
 
@@ -54,7 +54,11 @@ Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下
 
 ![Clash / Mihomo 配置界面](docs/images/proxy-sample.png)
 
+本版完善失败提示：区分权限 / 访问受限、文件占用与路径失效，并显示下一步操作、相关路径和原始错误。详见[使用说明](docs/使用说明.md#遇到失败时怎么办)。
+
 ## 测试到哪一步了
+
+- v1.9.2：54 项业务回归、31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过。新增真实临时文件占用、访问拒绝、路径缺失及原生备份窗口指引检查通过。
 
 - v1.9.1：50 项业务回归和 31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过；发布 EXE 的原生资源核对及 Windows 要求提权（错误 740）检查通过。
 
@@ -72,7 +76,7 @@ Release 附件提供单文件 EXE、完整包和 SHA256 校验文件。备用下
 Set-Location 'source'
 go test -mod=vendor -count=1 ./...
 go vet -mod=vendor ./...
-go build -trimpath -mod=vendor -ldflags='-H windowsgui -s -w' -o '..\OPPO互联连接修复工具_v1.9.1.exe' .
+go build -trimpath -mod=vendor -ldflags='-H windowsgui -s -w' -o '..\OPPO互联连接修复工具_v1.9.2.exe' .
 ```
 
 本版实际使用 Go 1.27.2 构建；未使用 Go 1.23 工具链复测。发布构建使用 `-trimpath` 去除本机编译路径。修改 `app.manifest` 后先运行 `go generate .`。

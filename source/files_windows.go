@@ -4,7 +4,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -24,21 +23,21 @@ type fileDACL struct {
 func readFileDACL(path string) (*fileDACL, error) {
 	p := nativePath(path)
 	var size uint32
-	fileSecurity.NewProc("GetFileSecurityW").Call(uintptr(unsafe.Pointer(p)), 4, 0, 0, uintptr(unsafe.Pointer(&size)))
+	_, _, err := fileSecurity.NewProc("GetFileSecurityW").Call(uintptr(unsafe.Pointer(p)), 4, 0, 0, uintptr(unsafe.Pointer(&size)))
 	if size == 0 {
-		return nil, errors.New("无法读取原文件访问权限")
+		return nil, &os.PathError{Op: "读取文件访问权限", Path: path, Err: err}
 	}
 	d := make([]byte, size)
 	r, _, err := fileSecurity.NewProc("GetFileSecurityW").Call(uintptr(unsafe.Pointer(p)), 4, uintptr(unsafe.Pointer(&d[0])), uintptr(size), uintptr(unsafe.Pointer(&size)))
 	runtime.KeepAlive(p)
 	if r == 0 {
-		return nil, err
+		return nil, &os.PathError{Op: "读取文件访问权限", Path: path, Err: err}
 	}
 	var control uint16
 	var revision uint32
 	r, _, err = fileSecurity.NewProc("GetSecurityDescriptorControl").Call(uintptr(unsafe.Pointer(&d[0])), uintptr(unsafe.Pointer(&control)), uintptr(unsafe.Pointer(&revision)))
 	if r == 0 {
-		return nil, err
+		return nil, &os.PathError{Op: "读取文件访问权限", Path: path, Err: err}
 	}
 	return &fileDACL{d, control&0x1000 != 0}, nil
 }
@@ -52,7 +51,7 @@ func applyFileDACL(path string, d *fileDACL) error {
 	runtime.KeepAlive(p)
 	runtime.KeepAlive(d)
 	if r == 0 {
-		return fmt.Errorf("保留原文件访问权限失败：%w", err)
+		return &os.PathError{Op: "保留原文件访问权限", Path: path, Err: err}
 	}
 	return nil
 }
@@ -88,7 +87,7 @@ func checkDLLPath(path string) error {
 		attrs, _, e := fileKernel.NewProc("GetFileAttributesW").Call(uintptr(unsafe.Pointer(p)))
 		runtime.KeepAlive(p)
 		if uint32(attrs) == 0xffffffff {
-			return e
+			return &os.PathError{Op: "检查 DLL 路径", Path: current, Err: e}
 		}
 		if attrs&0x400 != 0 {
 			return errors.New("DLL 路径含目录联接、符号链接或重解析点，请选择真实安装目录")
@@ -102,7 +101,7 @@ func renameNoReplace(source, target string) error {
 	runtime.KeepAlive(a)
 	runtime.KeepAlive(b)
 	if r == 0 {
-		return err
+		return &os.LinkError{Op: "重命名 DLL", Old: source, New: target, Err: err}
 	}
 	return nil
 }
@@ -116,7 +115,7 @@ func copyNewFile(source, target string) error {
 	runtime.KeepAlive(a)
 	runtime.KeepAlive(b)
 	if r == 0 {
-		return err
+		return &os.LinkError{Op: "备份文件", Old: source, New: target, Err: err}
 	}
 	if err = applyFileDACL(target, security); err != nil {
 		os.Remove(target)
@@ -138,7 +137,7 @@ func replaceNative(target, temp string) error {
 	runtime.KeepAlive(a)
 	runtime.KeepAlive(b)
 	if r == 0 {
-		return err
+		return &os.LinkError{Op: "替换文件", Old: temp, New: target, Err: err}
 	}
 	return nil
 }
@@ -155,7 +154,7 @@ func openYAMLGuard(path string) (*yamlFileGuard, error) {
 	h, _, err := fileKernel.NewProc("CreateFileW").Call(uintptr(unsafe.Pointer(name)), 0xc0000000, 0, 0, 4, 0x04000102, 0)
 	runtime.KeepAlive(name)
 	if h == ^uintptr(0) {
-		return nil, fmt.Errorf("配置正在被另一个操作处理，或无法建立文件保护：%w", err)
+		return nil, &os.PathError{Op: "建立配置文件保护", Path: lockName, Err: err}
 	}
 	g := &yamlFileGuard{lock: os.NewFile(h, lockName)}
 	p := nativePath(path)
@@ -164,7 +163,7 @@ func openYAMLGuard(path string) (*yamlFileGuard, error) {
 	runtime.KeepAlive(p)
 	if h == ^uintptr(0) {
 		g.Close()
-		return nil, fmt.Errorf("配置正在被写入或无法读取，请关闭编辑器后重试：%w", err)
+		return nil, &os.PathError{Op: "读取配置文件", Path: path, Err: err}
 	}
 	g.source = os.NewFile(h, path)
 	return g, nil

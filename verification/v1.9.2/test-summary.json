@@ -1,0 +1,16 @@
+{
+  "Version": "v1.9.2",
+  "TopLevelPass": 54,
+  "TopLevelSkip": 1,
+  "FuzzSeedPass": 31,
+  "Failed": 0,
+  "VetPassed": true,
+  "TestResourceLevel": "asInvoker（仅隔离测试副本；发布版保留 requireAdministrator）",
+  "NewFailureRegressionPass": 24,
+  "RealWindowsFailureCases": [
+    "共享冲突：锁定临时 DLL",
+    "访问拒绝：临时 YAML 专用 DACL",
+    "路径失效：不存在的临时路径"
+  ],
+  "OnlyTemporaryFilesUsed": true
+}

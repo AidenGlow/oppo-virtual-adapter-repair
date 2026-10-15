@@ -189,7 +189,7 @@ func changeDLL(selected string, restore bool) (string, error) {
 		return "", e
 	}
 	if e = renameNoReplace(a, b); e != nil {
-		return "", fmt.Errorf("无法重命名，可能正在被程序占用或缺少权限：%w", e)
+		return "", fmt.Errorf("重命名 DLL 失败：%w", e)
 	}
 	return b, nil
 }

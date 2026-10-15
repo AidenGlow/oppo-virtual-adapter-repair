@@ -1,5 +1,20 @@
 # 测试结果与已知范围
 
+## v1.9.2（2026-10-15）
+
+| 检查 | 结果 |
+| --- | --- |
+| 全量业务回归 | 54 项顶层测试通过，0 失败；1 项符号链接测试因 Token 权限不足跳过 |
+| 模糊测试种子 | 31 个通过；语句覆盖率 70.9% |
+| 新增错误提示回归 | 17 个 Windows 错误码场景、错误链中的实际路径、源与目标路径及备份上下文通过；非本次范围的安全提示原样保留 |
+| 真实 Windows 临时文件故障 | 持有 DLL 句柄造成共享冲突；仅对临时 YAML 设置专用 DACL 造成访问拒绝；不存在的临时 DLL 路径造成查找失败。分类、操作指引与失败后文件不变检查通过 |
+| 原生窗口 | 缺失 YAML 时，备份窗口显示重新识别 / 手动指定指引，恢复按钮禁用，未生成文件 |
+| 构建与资源 | go vet、Go 1.27.2 离线 Windows AMD64 GUI 构建通过；内嵌 requireAdministrator / PerMonitorV2 与源码一致，普通权限直接启动返回 740 |
+
+记录见 [test-summary.json](verification/v1.9.2/test-summary.json) 和 [elevation.json](verification/v1.9.2/elevation.json)。业务回归在隔离源码副本中使用 asInvoker 测试资源；正式源码与 EXE 保留 requireAdministrator。没有点击 UAC 授权窗口、操作真实 OPPO 文件或代理配置，也未执行重启。本轮专门验证失败提示，未新增真实设备和网络联调结果。
+
+错误码依据：[Microsoft Windows 系统错误码](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-)。只依据错误链分类，不通过错误文字猜测，也不自动关闭程序或调整文件权限。
+
 ## v1.9.1（2026-10-15）
 
 | 检查 | 结果 |

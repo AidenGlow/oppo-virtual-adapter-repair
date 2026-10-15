@@ -101,7 +101,7 @@ func refreshYAMLBackups() {
 	entries, err := findYAMLBackups(backupTarget)
 	if err != nil {
 		text(backupStatus, "未能读取当前配置的备份，可手动选择文件。")
-		text(backupDetailsText, err.Error())
+		text(backupDetailsText, fileFailureMessage(err, modeYAML, backupTarget))
 		return
 	}
 	backupEntries = entries
@@ -143,7 +143,7 @@ func restoreChosenYAMLBackup(owner uintptr, backup string) bool {
 	}
 	plan, err := prepareYAMLRestore(backup)
 	if err != nil {
-		alertFor(owner, "备份校验失败", err.Error(), errIcon)
+		alertFor(owner, "备份校验失败", fileFailureMessage(err, modeYAML, backup), errIcon)
 		return false
 	}
 	checkClient := func() error {
@@ -165,7 +165,7 @@ func restoreChosenYAMLBackup(owner uintptr, backup string) bool {
 	}
 	dest, protect, err := applyYAMLRestore(plan)
 	if err != nil {
-		detail := err.Error()
+		detail := fileFailureMessage(err, modeYAML, plan.targetPath)
 		if protect != "" {
 			detail += "\n\n当前配置保护备份：\n" + protect
 		}
