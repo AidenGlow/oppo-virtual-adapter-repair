@@ -21,7 +21,7 @@
 
 ## 下载和使用
 
-[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/download/v1.9/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/download/v1.9/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
+[下载 Windows 64 位 EXE](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9.exe) · [下载完整包](https://github.com/AidenGlow/oppo-virtual-adapter-repair/raw/refs/heads/main/downloads/OPPO%E4%BA%92%E8%81%94%E8%BF%9E%E6%8E%A5%E4%BF%AE%E5%A4%8D%E5%B7%A5%E5%85%B7_v1.9_%E5%AE%8C%E6%95%B4%E5%8C%85.zip)
 
 双击 EXE 即可运行，无需安装 Go 或 Python。程序未签名，Windows 可能显示“未知发布者”；修改受保护的安装目录时可能需要管理员权限。
 
