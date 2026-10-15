@@ -1,0 +1,37 @@
+OPPO互联占用虚拟网卡修复 v1.9 第三方许可说明
+
+本项目自有源码的 MIT 许可证见 LICENSE。第三方组件按各自许可证分发。
+
+1. go.yaml.in/yaml/v3 v3.0.5
+   用途：YAML 节点解析与校验；输出仍由本工具在原始文本上局部修改。
+   项目：https://github.com/yaml/go-yaml
+   保留原样的依赖源码：source/vendor/go.yaml.in/yaml/v3/
+   上游许可和声明：该目录的 LICENSE、NOTICE。
+   上游部分文件适用 MIT，其余适用 Apache License 2.0。
+   许可副本：licenses/YAML-LICENSE.txt、YAML-NOTICE.txt、Apache-2.0.txt。
+   vendor 源码未作本地修改。
+
+2. Go 运行时与标准库
+   本次 EXE 使用 Go 1.27.2 构建，包含 Go 运行时及标准库。
+   项目：https://go.dev/
+   BSD 许可及版权声明副本：licenses/Go-LICENSE.txt。
+
+3. 客户端识别图标
+   用途：仅在“支持修改软件”一栏展示客户端名称和标识。
+   原始文件：source/assets/clash-verge-rev.png、clash-for-windows.png。
+   原始图标未修改，显示时按 DPI 缩放；图标及名称属于各自权利人，
+   不属于本项目自有 MIT 源码，也不表示相关项目为本工具背书。
+
+   Clash Verge Rev：来自上游 v2.5.8 的 256×256 PNG。
+   https://github.com/clash-verge-rev/clash-verge-rev/blob/v2.5.8/src-tauri/icons/128x128%402x.png
+   上游项目采用 GNU GPL v3.0；许可副本：licenses/Clash-Verge-Rev-GPL-3.0.txt。
+
+   Clash for Windows（Fndroid）：来自 Flathub 对应应用打包仓库的 PNG。
+   https://github.com/flathub/io.github.Fndroid.clash_for_windows/blob/master/io.github.Fndroid.clash_for_windows.png
+   保留其原有标识及权属；未将该图标声明为 MIT 授权。
+   获取日期和素材清单：source/assets/README.md。
+
+Apache License 2.0 全文来源：
+https://www.apache.org/licenses/LICENSE-2.0.txt
+
+请在再分发 EXE 或源码时同时保留本说明、相关许可与上游 NOTICE。

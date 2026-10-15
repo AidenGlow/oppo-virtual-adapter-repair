@@ -1,0 +1,10 @@
+{
+  "TopLevelTestsPassed": 50,
+  "TopLevelTestsSkipped": 1,
+  "SkippedTests": [
+    "TestFindYAMLBackupsSkipsSymlink"
+  ],
+  "FuzzSeedsPassed": 31,
+  "Failures": 0,
+  "StatementCoverage": "74.2%"
+}

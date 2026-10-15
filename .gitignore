@@ -1,0 +1,21 @@
+# 本地工具、缓存、私有测试截图与历史产物
+/_review/
+/_verification/
+/_publish/
+/dist/
+/release-assets/
+/verification-local/
+*.exe
+*.zip
+*.test
+*.out
+*.log
+*.bak
+*.tmp
+.env
+.env.*
+Thumbs.db
+Desktop.ini
+
+# DPI manifest 资源必须随源码保留
+!source/app_windows_amd64.syso
