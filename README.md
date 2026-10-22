@@ -1,5 +1,7 @@
 # OPPO互联占用虚拟网卡修复
 
+**[项目介绍页：适用场景、使用方法与最新版下载](https://aidenglow.github.io/oppo-virtual-adapter-repair/)**
+
 **安装 OPPO 互联后，Clash / Mihomo 开启 TUN 模式就断网、无法联网？** 这是一个面向 Windows 的中文修复工具，将 OPPO 程序文件处理、代理联网网卡配置和备份恢复放在同一个界面里，帮助排查 OPPO 互联与 TUN 虚拟网卡的兼容性冲突。
 
 **Windows 10 / 11 · 64 位 · 单文件 EXE · 支持 Clash Verge Rev 和 Clash for Windows · 当前稳定版 v1.11.0**

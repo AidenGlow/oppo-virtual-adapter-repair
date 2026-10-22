@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPPO 互联导致 TUN 断网？Windows 修复工具与使用方法</title>
+  <meta name="description" content="安装 OPPO 互联后，Clash / Mihomo 开启 TUN 就断网、VPN 失效？下载 Windows 64 位修复工具，自主选择 DLL 修复或指定联网网卡，支持 Clash Verge Rev、Clash for Windows、备份恢复与生效检查。">
+  <meta name="theme-color" content="#087f68">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://aidenglow.github.io/oppo-virtual-adapter-repair/">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+  <link rel="sitemap" type="application/xml" href="sitemap.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:title" content="OPPO 互联占用虚拟网卡修复 · Windows 工具">
+  <meta property="og:description" content="OPPO 互联后 TUN 无法联网？两种修复方式自主选择，自动找文件、保留备份、支持恢复。">
+  <meta property="og:url" content="https://aidenglow.github.io/oppo-virtual-adapter-repair/">
+  <meta property="og:image" content="https://aidenglow.github.io/oppo-virtual-adapter-repair/images/proxy-sample.png">
+  <meta property="og:image:alt" content="OPPO 互联修复工具的配置界面示例，使用样本数据">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "OPPO互联占用虚拟网卡修复",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Windows 10/11 x64",
+    "inLanguage": "zh-CN",
+    "url": "https://aidenglow.github.io/oppo-virtual-adapter-repair/",
+    "downloadUrl": "https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64.exe",
+    "description": "用于排查 Windows 上 OPPO 互联与 Clash / Mihomo TUN 的网卡兼容性冲突，提供 DLL 改名、指定联网网卡和备份恢复。",
+    "author": {"@type": "Person", "name": "AidenGlow", "url": "https://github.com/AidenGlow"},
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"},
+    "license": "https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/main/LICENSE"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="header wrap">
+    <a class="brand" href="#" aria-label="OPPO 互联占用虚拟网卡修复首页"><img src="icon.svg" width="36" height="36" alt=""><span>OPPO 互联<span class="brand-sub">占用虚拟网卡修复</span></span></a>
+    <nav aria-label="主导航"><a href="#methods">使用方法</a><a href="#restore">备份与恢复</a><a class="repo-link" href="https://github.com/AidenGlow/oppo-virtual-adapter-repair">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> WINDOWS 修复工具 · 免费开源</p>
+        <h1 id="hero-title">OPPO 互联后，<br><span>TUN 又断网了？</span></h1>
+        <p class="lead">为 OPPO 互联与 Clash / Mihomo 的网卡冲突提供两种排障方式。自动找文件，由你选择修复，遇到问题可以恢复。</p>
+        <a class="button primary download" href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64.exe"><span aria-hidden="true">↓</span> 下载最新版 Windows EXE</a>
+        <p class="platform">Windows 10 / 11 · 64 位 · Intel / AMD x64<br>双击运行，确认 Windows 管理员授权即可。</p>
+        <div class="small-links"><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest">发布详情</a><span aria-hidden="true">·</span><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64-full.zip">完整包 ZIP</a><span aria-hidden="true">·</span><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/SHA256-latest.txt">SHA256 校验</a></div>
+      </div>
+      <div class="route-card" aria-label="联网路径示意：Clash 或 Mihomo 的 TUN 流量需要从实际联网的 Wi-Fi 或以太网发出">
+        <div class="route-heading"><span>让代理找到真正的联网出口</span><span class="diagram-label">原理示意</span></div>
+        <div class="route-node"><span class="node-icon" aria-hidden="true">↔</span><div><strong>Clash / Mihomo</strong><span>TUN 接收需要代理的流量</span></div><span class="chip">入口</span></div>
+        <div class="route-line"><span>指定实际联网网卡</span><span aria-hidden="true">↓</span></div>
+        <div class="route-node active"><span class="node-icon" aria-hidden="true">↗</span><div><strong>Wi-Fi / 以太网</strong><span>由你选择当前使用的物理网卡</span></div><span class="chip">出口</span></div>
+        <div class="route-line short" aria-hidden="true">↓</div>
+        <div class="route-end"><span class="status-dot" aria-hidden="true"></span> 互联网</div>
+        <p class="route-note">多网卡环境下，明确出口是其中一种排障思路。</p>
+      </div>
+    </section>
+    <div class="trust-strip"><div class="wrap"><span>支持 <strong>Clash Verge Rev</strong></span><span>支持 <strong>Clash for Windows</strong></span><span>最终确认后才修改</span><span>备份与恢复</span></div></div>
+
+    <section class="section wrap problem" aria-labelledby="problem-title">
+      <div><p class="eyebrow">适用场景</p><h2 id="problem-title">原本能上网，<br>开启 TUN 就失联。</h2></div>
+      <div class="problem-copy"><p>安装或启动 OPPO 互联后，Clash / Mihomo 的 TUN 模式无法联网；关闭 TUN 后网络恢复，或 Windows 中出现了额外虚拟网卡。这是本工具重点排查的场景。</p><p>社区案例记录了 OPPO 互联引入 <code>utun8</code> 后发生冲突。新增接口可能影响代理出口选择或路由；具体原因需要结合本机日志确认。</p><a class="text-link" href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/main/docs/原因说明.md">了解案例与两种方法的原理 <span aria-hidden="true">↗</span></a></div>
+    </section>
+
+    <section class="section wrap" id="methods" aria-labelledby="methods-title">
+      <div class="section-heading"><div><p class="eyebrow">使用方法</p><h2 id="methods-title">两种方式，按需选择。</h2></div><p>独立使用，无需依次执行。<br>打开界面、识别文件和扫描网卡都是只读操作。</p></div>
+      <div class="methods-grid">
+        <article class="method-card"><div class="method-top"><span class="method-number">01</span><span class="method-tag">处理 OPPO 组件</span></div><h3>OPPO DLL 修复</h3><p class="method-intro">将指定 Wintun 文件改名，排查 OPPO 相关组件冲突。</p><ol class="steps"><li><strong>先登录并连接手机</strong><span>在 OPPO 互联中登录账号，确认手机已连接并保持连接。</span></li><li><strong>核对文件，确认修复</strong><span>选择“OPPO DLL 修复”，核对自动找到的安装目录，勾选连接确认，再点击修复并最终确认。</span></li><li><strong>重启电脑</strong><span>工具将 <code>daemon/wintun.dll</code> 改名。按提示重启 Windows，再检查连接效果。</span></li></ol><div class="method-note"><strong>可能遇到</strong><p>新设备或部分连接方式可能受影响；OPPO 更新后可能需要重新核对。如遇问题可点击“恢复 DLL”，恢复后也需重启电脑。</p></div></article>
+        <article class="method-card"><div class="method-top"><span class="method-number">02</span><span class="method-tag">指定代理出口</span></div><h3>Clash / Mihomo 配置</h3><p class="method-intro">选择实际联网的 Wi-Fi 或以太网，明确代理出口。</p><ol class="steps"><li><strong>完全退出代理客户端</strong><span>包括托盘程序。在工具中选择“Clash / Mihomo 配置”，核对识别到的客户端与配置。</span></li><li><strong>选择网卡，确认修改</strong><span>扫描后按连接状态和设备说明选择物理网卡。不要仅凭列表顺序选第一项；核对预览并最终确认。</span></li><li><strong>重开客户端，检查生效</strong><span>重新打开代理客户端并开启 TUN，再点击“检查是否生效”，最后打开常用网页确认实际联网。</span></li></ol><div class="method-note"><strong>可能遇到</strong><p>选错网卡可能断网；换网络、订阅刷新或脚本可能覆盖设置。如遇问题可点击恢复，选择局部撤销或整份恢复。</p></div></article>
+      </div>
+      <details class="config-details"><summary>想了解具体改了什么？查看 YAML 配置</summary><div class="config-content"><pre><code>interface-name: "Wi-Fi"  # 换成实际联网网卡的名称
+tun:
+  auto-detect-interface: false</code></pre><p><code>interface-name</code> 位于顶层，与 <code>tun</code> 同级；<code>tun.device</code> 是 TUN 自身的名称。工具会先备份，再修改对应字段，保留其他配置。</p></div></details>
+    </section>
+
+    <section class="restore-band" id="restore" aria-labelledby="restore-title"><div class="wrap section"><div class="section-heading"><div><p class="eyebrow">备份与恢复</p><h2 id="restore-title">改过的设置，有路可退。</h2></div><p>先退出代理客户端，再恢复 YAML。<br>自动查找对应备份，选择后最终确认。</p></div><div class="restore-grid"><article><span class="restore-icon" aria-hidden="true">↶</span><h3>只撤销网卡设置</h3><p>只还原本工具改过的网卡字段，保留后来修改的节点、规则和其他设置。字段有冲突时停止并提示。</p></article><article><span class="restore-icon" aria-hidden="true">▤</span><h3>恢复整份 YAML</h3><p>按时间选择原配置备份，整份还原。会覆盖备份之后的修改，操作前另存当前配置。</p></article><article><span class="restore-icon" aria-hidden="true">↔</span><h3>恢复 DLL 原名</h3><p>找到原安装目录中的已改名 DLL，点击“恢复 DLL”。恢复后重启 Windows。</p></article></div><p class="backup-note">请保留原 <code>.bak</code> 和对应的 <code>.bak.oppo-repair.json</code>。删除工具、重新下载后仍可恢复；DLL 恢复需要保留已改名的原文件。</p></div></section>
+
+    <section class="section wrap faq-section" aria-labelledby="faq-title"><div><p class="eyebrow">常见问题</p><h2 id="faq-title">下载前，<br>你可能还想知道。</h2><a class="text-link" href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/main/docs/使用说明.md">阅读完整中文说明 <span aria-hidden="true">↗</span></a></div><div class="faq-list">
+      <details><summary>OPPO 互联导致 VPN 失效，这个工具适用吗？</summary><p>如果指的是 Windows 安装 OPPO 互联后，Clash / Mihomo 开启 TUN 就无法联网，可以用本工具排查。适用范围是电脑上的代理网卡冲突；OPPO 手机上的 VPN 应用问题需要另外排查。</p></details>
+      <details><summary>Windows 应该下载哪个文件？</summary><p>普通用户下载本页的“最新版 Windows EXE”即可。支持 Windows 10 / 11 x64；文件名中的 <code>amd64</code> 包含 Intel 和 AMD 的 x64 电脑。无需安装 Go 或 Python。需要源码与说明可下载完整包；GitHub 的 <code>Source code</code> 是源码包。</p></details>
+      <details><summary>只是打开软件，会修改配置吗？</summary><p>打开界面、自动识别文件、扫描网卡和检查是否生效都是只读操作。修复与恢复需要核对目标并最终确认。</p></details>
+      <details><summary>提示文件占用、权限不足或路径失效，怎么办？</summary><p>文件被占用时，按提示保存工作并正常退出相关程序，工具会尝试显示程序名和 PID。权限不足时核对 Windows 管理员授权；路径失效时重新识别或手动指定文件。详细步骤可在中文说明中查看。</p></details>
+      <details><summary>显示“配置已生效”，就一定能上网吗？</summary><p>这表示当前运行内核采用了相应网卡设置，并已开启 TUN。实际联网还受节点和网络环境影响，请再打开常用网页确认。</p></details>
+    </div></section>
+
+    <section class="closing wrap"><div><h2>从清楚地选择，开始修复。</h2><p>免费开源 · 中文界面 · 两种方式自主选择</p></div><a class="button primary" href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64.exe">下载最新版 EXE <span aria-hidden="true">↓</span></a></section>
+  </main>
+  <footer class="footer wrap"><p>由 <a href="https://github.com/AidenGlow">AidenGlow</a> 维护的第三方开源工具<br>OPPO 互联占用虚拟网卡修复</p><nav aria-label="项目资料"><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair">项目源码</a><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/issues">反馈问题</a><a href="https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/main/TEST_RESULTS.md">测试记录</a><a href="https://github.com/clash-verge-rev/clash-verge-rev/discussions/6712">社区案例</a></nav></footer>
+</body>
+</html>
