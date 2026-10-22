@@ -316,6 +316,9 @@ func updateYaml(path, adapter string) (string, error) {
 	if e = checkFileSnapshot(path, info, original); e != nil {
 		return backup, e
 	}
+	if e = writeNetworkReceipt(backup, adapter, original); e != nil {
+		return backup, fmt.Errorf("保存网卡撤销记录失败，未写入配置：%w", e)
+	}
 	guard.closeSource()
 	if e = checkFileSnapshot(path, info, original); e != nil {
 		return backup, e

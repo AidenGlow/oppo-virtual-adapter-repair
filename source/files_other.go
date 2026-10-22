@@ -68,3 +68,11 @@ func (g *yamlFileGuard) Close() {
 		os.Remove(name)
 	}
 }
+
+func createReceiptFile(source, target string) (*os.File, error) {
+	info, err := os.Stat(source)
+	if err != nil {
+		return nil, err
+	}
+	return os.OpenFile(target, os.O_CREATE|os.O_EXCL|os.O_WRONLY, info.Mode().Perm())
+}

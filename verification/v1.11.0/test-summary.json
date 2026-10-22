@@ -1,0 +1,23 @@
+{
+  "Version": "v1.11.0",
+  "Date": "2026-10-22",
+  "TopLevelPass": 82,
+  "TopLevelSkip": 1,
+  "SkippedTests": [
+    "TestFindYAMLBackupsSkipsSymlink"
+  ],
+  "FuzzSeedPass": 31,
+  "Failed": 0,
+  "CoveragePercent": 76.3,
+  "VetPassed": true,
+  "TestResourceLevel": "asInvoker（仅隔离临时副本；发布版保留 requireAdministrator）",
+  "OnlyTemporaryConfigurationsUsed": true,
+  "SelectiveUndoPreservesLaterNodesRulesAndPassword": true,
+  "SelectiveUndoConflictAndSnapshotChecksPassed": true,
+  "OriginalFullRestorePreserved": true,
+  "RealTemporaryFileOwnerPIDIdentified": true,
+  "FileOwnerQueryDoesNotStopHolder": true,
+  "FileOwnerTimeoutAndBusyLimitPassed": true,
+  "ReceiptDACLVerified": true,
+  "RealOPPOAndProxyConfigurationsModified": false
+}

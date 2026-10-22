@@ -1,0 +1,12 @@
+{
+  "exe": "OPPO互联连接修复工具_v1.11.0.exe",
+  "exe_sha256": "2407785a902f32b3592905fd7d9363538fd72c3a32900b4d8969955575ce19a7",
+  "embedded_manifest_matches_source": true,
+  "requested_execution_level": "requireAdministrator",
+  "ui_access": false,
+  "per_monitor_v2_preserved": true,
+  "caller_is_administrator": false,
+  "uac_consent_clicked": false,
+  "non_elevated_launch_check": "passed",
+  "windows_error": 740
+}

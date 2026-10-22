@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -24,6 +25,7 @@ var (
 	backupCallback                                                           uintptr
 	backupView                                                               uiView
 	backupTarget                                                             string
+	backupUndoMode                                                           bool
 	backupEntries                                                            []YAMLBackup
 	chooseYAMLBackupFile                                                     = func(owner uintptr) string {
 		return filePick(owner, "手动选择 YAML 备份", filts("本工具生成的备份 (*.bak)", "*.bak", "所有文件 (*.*)", "*.*"))
@@ -35,11 +37,19 @@ var (
 
 func backupUI(h uintptr) {
 	backupView.init(h)
-	addChrome(&backupView, "选择 YAML 备份", false)
+	title := "选择 YAML 备份"
+	if backupUndoMode {
+		title = "只撤销网卡设置"
+	}
+	addChrome(&backupView, title, false)
 	a := func(class, title string, x, y, w, height int32, style uint32, id uintptr, role int, key string) uintptr {
 		return backupView.add(class, title, x, y, w, height, style, id, role, modeAny, key)
 	}
-	a("STATIC", "当前配置的备份 · 按备份时间从新到旧排列", 24, 56, -24, 22, 0, 0, 1, "")
+	intro := "当前配置的备份 · 按备份时间从新到旧排列"
+	if backupUndoMode {
+		intro = "选择原修复记录 · 只还原网卡字段，保留当前节点与规则"
+	}
+	a("STATIC", intro, 24, 56, -24, 22, 0, 0, 1, "")
 	target := backupTarget
 	if target == "" {
 		target = "尚未选择配置，可返回主界面选择，或点击下方“手动选择文件”。"
@@ -104,6 +114,16 @@ func refreshYAMLBackups() {
 		text(backupDetailsText, fileFailureMessage(err, modeYAML, backupTarget))
 		return
 	}
+	if backupUndoMode {
+		filtered := []YAMLBackup{}
+		for _, entry := range entries {
+			info, e := os.Lstat(entry.Path + networkReceiptSuffix)
+			if e == nil && info.Mode().IsRegular() {
+				filtered = append(filtered, entry)
+			}
+		}
+		entries = filtered
+	}
 	backupEntries = entries
 	for _, entry := range entries {
 		label := pstr(entry.Time.Format("2006-01-02 15:04:05.000") + " | " + entry.Path)
@@ -111,7 +131,11 @@ func refreshYAMLBackups() {
 		runtime.KeepAlive(label)
 	}
 	if len(entries) == 0 {
-		text(backupStatus, "当前配置未找到对应备份；可手动选择文件，未修改任何文件。")
+		message := "当前配置未找到对应备份；可手动选择文件，未修改任何文件。"
+		if backupUndoMode {
+			message = "没有带撤销记录的备份；旧版备份可返回使用‘恢复 YAML 备份’。"
+		}
+		text(backupStatus, message)
 	} else {
 		text(backupStatus, fmt.Sprintf("找到 %d 份备份，请选择；恢复前请完全退出代理客户端。", len(entries)))
 	}
@@ -133,6 +157,16 @@ func showYAMLBackupDetails() {
 		return
 	}
 	entry := backupEntries[i]
+	if backupUndoMode {
+		plan, err := prepareNetworkUndo(entry.Path)
+		if err != nil {
+			enable(backupConfirm, false)
+			text(backupDetailsText, err.Error())
+			return
+		}
+		text(backupDetailsText, plan.summary+"\r\n原备份："+entry.Path)
+		return
+	}
 	text(backupDetailsText, "备份时间："+entry.Time.Format("2006-01-02 15:04:05.000")+"\r\n"+entry.Path)
 }
 
@@ -179,6 +213,12 @@ func restoreChosenYAMLBackup(owner uintptr, backup string) bool {
 	return true
 }
 
+func applyChosenBackup(owner uintptr, backup string) bool {
+	if backupUndoMode {
+		return undoChosenNetworkBackup(owner, backup)
+	}
+	return restoreChosenYAMLBackup(owner, backup)
+}
 func backupCommand(id uintptr) {
 	switch id {
 	case backupRefreshID:
@@ -186,11 +226,11 @@ func backupCommand(id uintptr) {
 	case backupListID:
 		showYAMLBackupDetails()
 	case backupConfirmID:
-		if i := selectedYAMLBackup(); i >= 0 && restoreChosenYAMLBackup(backupWindow, backupEntries[i].Path) {
+		if i := selectedYAMLBackup(); i >= 0 && applyChosenBackup(backupWindow, backupEntries[i].Path) {
 			destroyWindow.Call(backupWindow)
 		}
 	case backupManualID:
-		if restoreChosenYAMLBackup(backupWindow, chooseYAMLBackupFile(backupWindow)) {
+		if applyChosenBackup(backupWindow, chooseYAMLBackupFile(backupWindow)) {
 			destroyWindow.Call(backupWindow)
 		}
 	case backupCancelID, 2:
@@ -276,28 +316,38 @@ func backupProc(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
 		backupWindow, backupList, backupDetailsText, backupStatus, backupConfirm = 0, 0, 0, 0, 0
 		backupEntries = nil
 		backupTarget = ""
+		backupUndoMode = false
 		return 0
 	}
 	r, _, _ := defaultProc.Call(h, uintptr(m), w, uintptr(l))
 	return r
 }
 
-func createYAMLBackupWindow(target string) uintptr {
+func createYAMLBackupWindow(target string) uintptr  { return createBackupWindowMode(target, false) }
+func createNetworkUndoWindow(target string) uintptr { return createBackupWindowMode(target, true) }
+func createBackupWindowMode(target string, undo bool) uintptr {
+	backupUndoMode = undo
 	if backupCallback == 0 {
 		backupCallback = syscall.NewCallback(backupProc)
 	}
 	backupTarget = target
 	registerNativeClass("OppoRepairBackupWindow2026", backupCallback, 6)
-	h := createNativeWindow("OppoRepairBackupWindow2026", "选择 YAML 备份 · "+appVersion, win, 700, 500, wCaption|wSysMenu|wMaximize|wClipChildren|0x00040000)
+	title := "选择 YAML 备份"
+	if undo {
+		title = "只撤销网卡设置"
+	}
+	h := createNativeWindow("OppoRepairBackupWindow2026", title+" · "+appVersion, win, 700, 500, wCaption|wSysMenu|wMaximize|wClipChildren|0x00040000)
 	refreshYAMLBackups()
 	return h
 }
 
-func launchYAMLBackupChooser() {
+func launchYAMLBackupChooser()  { launchBackupChooserMode(false) }
+func launchNetworkUndoChooser() { launchBackupChooserMode(true) }
+func launchBackupChooserMode(undo bool) {
 	if backupWindow != 0 {
 		return
 	}
-	h := createYAMLBackupWindow(yamlPath)
+	h := createBackupWindowMode(yamlPath, undo)
 	enable(win, false)
 	defer func() {
 		if win != 0 {

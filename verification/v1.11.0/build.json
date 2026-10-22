@@ -1,0 +1,11 @@
+{
+  "Version": "v1.11.0",
+  "Go": "go1.27.2",
+  "GOOS": "windows",
+  "GOARCH": "amd64",
+  "CGO_ENABLED": "0",
+  "GUI": true,
+  "TrimPath": true,
+  "Size": 8082432,
+  "SHA256": "2407785a902f32b3592905fd7d9363538fd72c3a32900b4d8969955575ce19a7"
+}

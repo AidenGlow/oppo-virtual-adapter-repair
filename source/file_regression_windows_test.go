@@ -114,7 +114,7 @@ func TestYAMLBackupAndReplacementPreserveDACL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, p := range []string{path, backup} {
+	for _, p := range []string{path, backup, backup + networkReceiptSuffix} {
 		if after := fileDACLForTest(t, p); after != before {
 			t.Fatalf("%s 的 DACL 被改变：%s -> %s", p, before, after)
 		}

@@ -236,6 +236,10 @@ func (v *uiView) layoutMain() {
 			x = 24 + (w-44)/2
 			cw = (w - 44) / 2
 		}
+		if len(c.key) == 11 && c.key[:10] == "yamlAction" {
+			cw = (w - 88) / 4
+			x = 32 + int32(c.key[10]-'0')*(cw+8)
+		}
 		if c.key == "result" {
 			ch += extraHeight
 		}

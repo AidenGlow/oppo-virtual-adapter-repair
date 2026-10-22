@@ -9,11 +9,12 @@ import (
 	"syscall"
 )
 
-// 只根据错误链分类，不检查或改写文件，不按本地化的报错文字猜测原因。
+// 根据错误链分类；占用相关错误附加有时限的只读进程查询，不关闭程序或改写配置。
 func fileFailureMessage(err error, mode repairMode, path string) string {
 	if err == nil {
 		return ""
 	}
+	lookupPath := path
 	var code syscall.Errno
 	hasCode := errors.As(err, &code)
 	var reason, next string
@@ -56,5 +57,5 @@ func fileFailureMessage(err error, mode repairMode, path string) string {
 	if hasCode {
 		body += fmt.Sprintf("\n\nWindows 错误码：%d", uint32(code))
 	}
-	return body + "\n\n原始错误：\n" + err.Error()
+	return body + occupancyFailureHint(err, mode, lookupPath) + "\n\n原始错误：\n" + err.Error()
 }

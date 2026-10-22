@@ -181,3 +181,20 @@ func (g *yamlFileGuard) Close() {
 		g.lock = nil
 	}
 }
+
+func createReceiptFile(source, target string) (*os.File, error) {
+	security, err := readFileDACL(source)
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.OpenFile(target, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return nil, err
+	}
+	if err = applyFileDACL(target, security); err != nil {
+		file.Close()
+		os.Remove(target)
+		return nil, err
+	}
+	return file, nil
+}

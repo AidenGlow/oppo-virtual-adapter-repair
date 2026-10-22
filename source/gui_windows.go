@@ -92,6 +92,7 @@ const (
 	chooseCancel   = 404
 	chooseShowAll  = 405
 	checkEffective = 207
+	undoNetwork    = 208
 )
 
 type classDef struct {
@@ -136,6 +137,7 @@ var (
 	chooser, nicList, nicInfo, nicStatus                      uintptr
 	nicConfirmButton, nicRefreshButton, nicCancelButton       uintptr
 	nicShowAllButton, checkEffectiveButton                    uintptr
+	undoNetworkButton                                         uintptr
 	allAdapters                                               []Adapter
 	showAllAdapters                                           bool
 	renameButton, restoreDLLButton, openChooserButton         uintptr
@@ -188,10 +190,11 @@ func mainUI() {
 	proxyFindButton = a("BUTTON", "重新识别", -212, 196, 82, 32, bsOwnerDraw|wTab, findProxy, 0, modeYAML, "")
 	a("BUTTON", "手动指定", -122, 196, 90, 32, bsOwnerDraw|wTab, selectYaml, 0, modeYAML, "")
 	summaryText = a("STATIC", "识别配置后，手动选择实际联网的 Wi-Fi 或以太网。", 32, 236, -32, 32, 0, 0, 1, modeYAML, "")
-	a("STATIC", "可能遇到：选错网卡后断网，或订阅 / 脚本覆盖设置。\r\n如遇问题可点击恢复；请保留原配置和 .bak 备份。", 44, 281, -44, 40, 0, 0, 1, modeYAML, "notice")
-	openChooserButton = a("BUTTON", "扫描并选择网卡", 32, 340, 180, 36, bsOwnerDraw|wTab, openChooser, 0, modeYAML, "")
-	a("BUTTON", "恢复 YAML 备份", 224, 340, 150, 36, bsOwnerDraw|wTab, restoreYAML, 0, modeYAML, "")
-	checkEffectiveButton = a("BUTTON", "检查是否生效", 386, 340, 150, 36, bsOwnerDraw|wTab, checkEffective, 0, modeYAML, "")
+	a("STATIC", "可能遇到：选错网卡后断网，或订阅 / 脚本覆盖设置。\r\n如遇问题可点击恢复；请保留 .bak 备份及旁边的撤销记录。", 44, 281, -44, 40, 0, 0, 1, modeYAML, "notice")
+	openChooserButton = a("BUTTON", "扫描并选择网卡", 32, 340, 132, 36, bsOwnerDraw|wTab, openChooser, 1, modeYAML, "yamlAction0")
+	undoNetworkButton = a("BUTTON", "只撤销网卡设置", 172, 340, 132, 36, bsOwnerDraw|wTab, undoNetwork, 1, modeYAML, "yamlAction1")
+	a("BUTTON", "恢复 YAML 备份", 312, 340, 132, 36, bsOwnerDraw|wTab, restoreYAML, 1, modeYAML, "yamlAction2")
+	checkEffectiveButton = a("BUTTON", "检查是否生效", 452, 340, 132, 36, bsOwnerDraw|wTab, checkEffective, 1, modeYAML, "yamlAction3")
 	a("STATIC", "执行结果", 32, 406, -32, 20, 0, 0, 1, modeAny, "resultTitle")
 	statusText = a("EDIT", "就绪。请选择上方的一种修复方式。", 32, 431, -32, 40, esReadonly|esMultiline|esAutoVScroll|wScroll, 0, 0, modeAny, "result")
 	a("STATIC", "非官方工具 · 仅在确认后修改所选文件", 16, 496, -16, 22, 0, 0, 1, modeAny, "footer")
@@ -211,6 +214,7 @@ func refreshMainActions() {
 	enable(restoreDLLButton, currentMode == modeDLL && base == suffix)
 	enable(openChooserButton, currentMode == modeYAML && yamlPath != "")
 	enable(checkEffectiveButton, currentMode == modeYAML && yamlPath != "" && activeEffectivenessCheck == nil)
+	enable(undoNetworkButton, currentMode == modeYAML && yamlPath != "")
 }
 func setRepairMode(mode repairMode) {
 	if mode != modeDLL && mode != modeYAML {
@@ -372,8 +376,12 @@ func mainCommand(id uintptr) {
 		restoreAction()
 	case checkEffective:
 		beginEffectivenessCheck()
+	case undoNetwork:
+		if currentMode == modeYAML && yamlPath != "" {
+			launchNetworkUndoChooser()
+		}
 	case helpID:
-		alert("使用帮助", "两种修复方式独立使用，无需同时执行。\n\nDLL：选择方式后自动查找 OPPO 文件；多处结果时选择真实安装目录，找不到可手动选择。必须先登录 OPPO 互联并保持手机连接，勾选前提后修复。修复与恢复都需要重启电脑。\n\n网卡配置：选择 Clash Verge Rev 或 Clash for Windows，工具自动定位配置，不需要自行找 YAML。先完全退出所选代理软件，再扫描并手动选择联网网卡。最终确认后才备份修改，完成后重新打开客户端。CFW 须先在 Profiles 启用配置，订阅刷新可能重置修改。默认只显示已连接物理网卡，可点‘显示全部’；修复并重开客户端后可点‘检查是否生效’。\n\n不会修改系统 DNS、路由或网卡驱动。", info)
+		alert("使用帮助", "两种修复方式独立使用，无需同时执行。\n\nDLL：选择方式后自动查找 OPPO 文件；多处结果时选择真实安装目录，找不到可手动选择。必须先登录 OPPO 互联并保持手机连接，勾选前提后修复。修复与恢复都需要重启电脑。\n\n网卡配置：选择 Clash Verge Rev 或 Clash for Windows，工具自动定位配置，不需要自行找 YAML。先完全退出所选代理软件，再扫描并手动选择联网网卡。最终确认后才备份修改，完成后重新打开客户端。CFW 须先在 Profiles 启用配置，订阅刷新可能重置修改。默认只显示已连接物理网卡，可点‘显示全部’；修复并重开客户端后可点‘检查是否生效’。\n\n撤销：‘只撤销网卡设置’保留当前节点和规则，需要原 .bak 及旁边的 .oppo-repair.json；‘恢复 YAML 备份’会还原整份配置。均需先退出客户端并最终确认。文件占用失败时会尝试显示相关程序和 PID，请保存工作后正常退出。\n\n不会修改系统 DNS、路由或网卡驱动。", info)
 	}
 }
 func mainProc(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
@@ -629,7 +637,7 @@ func nicConfirm() {
 	rememberRepairExpectation(yamlPath, a.Name)
 	text(summaryText, "上次选择："+a.Name+"。再次修改仍需重新选择并确认。")
 	text(statusText, "YAML 已修改；网卡："+a.Name+"\r\n修改前备份："+backup)
-	alertFor(chooser, "修改完成", "已备份到：\n"+backup+"\n\n请重新打开所选代理客户端，使修改生效，再点击‘检查是否生效’。CFW 订阅刷新可能覆盖修改。", info)
+	alertFor(chooser, "修改完成", "已备份到：\n"+backup+"\n\n请重新打开所选代理客户端，使修改生效，再点击‘检查是否生效’。如需只撤销网卡改动，请保留原备份及旁边的 .oppo-repair.json 记录。CFW 订阅刷新可能覆盖修改。", info)
 	destroyWindow.Call(chooser)
 }
 func chooserProcFn(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
