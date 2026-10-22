@@ -70,6 +70,7 @@ func useDLLChoice() {
 	}
 }
 func useProxyChoice() {
+	stopEffectivenessCheck()
 	i := selectedPathIndex(yamlText)
 	yamlPath = ""
 	selectedProxy = nil
@@ -126,6 +127,7 @@ func stopPathSearch() {
 	enable(yamlText, true)
 }
 func beginPathSearch(mode repairMode) {
+	stopEffectivenessCheck()
 	if mode != modeDLL && mode != modeYAML {
 		return
 	}

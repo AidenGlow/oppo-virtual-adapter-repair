@@ -26,6 +26,7 @@ func TestNICRedesignKeepsNativeSelectionAndText(t *testing.T) {
 		if selected() != -1 || enabledForTest(nicConfirmButton) {
 			t.Fatal("新版列表自动选择或允许提交")
 		}
+		chooserProcFn(c, wmCommand, chooseShowAll, nil)
 		for i, a := range items {
 			buf := make([]uint16, 2048)
 			sendMessage.Call(nicList, 0x0189, uintptr(i), uintptr(unsafe.Pointer(&buf[0])))

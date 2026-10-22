@@ -1,0 +1,17 @@
+{
+  "Version": "v1.10.0",
+  "Date": "2026-10-22",
+  "TopLevelPass": 68,
+  "TopLevelSkip": 1,
+  "SkippedTests": [
+    "TestFindYAMLBackupsSkipsSymlink"
+  ],
+  "FuzzSeedPass": 31,
+  "Failed": 0,
+  "CoveragePercent": 72.3,
+  "VetPassed": true,
+  "TestResourceLevel": "asInvoker（仅隔离临时副本；发布版保留 requireAdministrator）",
+  "OnlyTemporaryConfigurationsUsed": true,
+  "RealLoopbackHTTPAndNamedPipePassed": true,
+  "RealOPPOAndProxyConfigurationsModified": false
+}

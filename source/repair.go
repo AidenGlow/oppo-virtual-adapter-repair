@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -25,11 +26,14 @@ type Adapter struct {
 	HardwareKnown bool   `json:"-"`
 	Index         int    `json:"IfIndex"`
 	MAC           string `json:"MacAddress"`
+	Gateway       string `json:"-"`
+	Recommended   bool   `json:"-"`
 	HasRoute      bool   `json:"-"`
 	RouteKnown    bool   `json:"-"`
 }
 type route struct {
-	Index int `json:"IfIndex"`
+	Index   int    `json:"IfIndex"`
+	Gateway string `json:"Gateway"`
 }
 type snapshot struct {
 	Adapters []struct {
@@ -54,8 +58,12 @@ func parseAdapters(b []byte) ([]Adapter, error) {
 		return nil, errors.New("Windows 没有返回任何网卡")
 	}
 	routeMap := map[int]bool{}
+	gatewayMap := map[int]string{}
 	for _, r := range s.Routes {
 		routeMap[r.Index] = true
+		if ip := net.ParseIP(r.Gateway); ip != nil && !ip.IsUnspecified() && !ip.IsLoopback() {
+			gatewayMap[r.Index] = r.Gateway
+		}
 	}
 	knownRoutes := s.Routes != nil
 	if s.RoutesKnown != nil {
@@ -71,6 +79,7 @@ func parseAdapters(b []byte) ([]Adapter, error) {
 			a.Hardware = *raw.Hardware
 		}
 		a.HasRoute = knownRoutes && routeMap[a.Index]
+		a.Gateway = gatewayMap[a.Index]
 		adapters = append(adapters, a)
 	}
 	sort.SliceStable(adapters, func(i, j int) bool {

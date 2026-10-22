@@ -16,7 +16,7 @@ const scanCommand = `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference='Stop'
 $items=@(Get-NetAdapter -IncludeHidden | ForEach-Object { [pscustomobject]@{ Name=[string]$_.Name; Description=[string]$_.InterfaceDescription; Status=[string]$_.Status; Hardware=$(if ($null -eq $_.HardwareInterface) { $null } else { [bool]$_.HardwareInterface }); IfIndex=[int]$_.ifIndex; MacAddress=[string]$_.MacAddress } })
 $routesKnown=$true
-try { $routes=@(Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction Stop | ForEach-Object { [pscustomobject]@{ IfIndex=[int]$_.ifIndex } }) } catch { $routes=@(); $routesKnown=$false }
+try { $routes=@(Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction Stop | ForEach-Object { [pscustomobject]@{ IfIndex=[int]$_.ifIndex; Gateway=[string]$_.NextHop } }) } catch { $routes=@(); $routesKnown=$false }
 @{Adapters=$items;Routes=$routes;RoutesKnown=$routesKnown} | ConvertTo-Json -Compress -Depth 5`
 
 func scanWindowsAdapters() ([]Adapter, error) {

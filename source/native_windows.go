@@ -276,7 +276,7 @@ func (v *uiView) layoutChooser() {
 		return
 	}
 	w, h := v.size()
-	detailHeight := int32(88)
+	detailHeight := int32(108)
 	if h < 400 {
 		detailHeight = 64
 	}

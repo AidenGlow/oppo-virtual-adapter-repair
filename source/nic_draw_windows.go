@@ -20,6 +20,9 @@ func nicRowDetails(a Adapter) string {
 			kind = "物理网卡"
 		}
 	}
+	if a.Recommended {
+		kind = "建议选择 · " + kind
+	}
 	if a.HasRoute {
 		kind += " · 默认路由"
 	}

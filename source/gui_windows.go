@@ -90,6 +90,8 @@ const (
 	chooseRefresh  = 402
 	chooseConfirm  = 403
 	chooseCancel   = 404
+	chooseShowAll  = 405
+	checkEffective = 207
 )
 
 type classDef struct {
@@ -133,6 +135,9 @@ var (
 	win, dllText, yamlText, summaryText, checkBox, statusText uintptr
 	chooser, nicList, nicInfo, nicStatus                      uintptr
 	nicConfirmButton, nicRefreshButton, nicCancelButton       uintptr
+	nicShowAllButton, checkEffectiveButton                    uintptr
+	allAdapters                                               []Adapter
+	showAllAdapters                                           bool
 	renameButton, restoreDLLButton, openChooserButton         uintptr
 	mainCallback, chooserProc                                 uintptr
 	backgroundBrush                                           uintptr
@@ -186,6 +191,7 @@ func mainUI() {
 	a("STATIC", "可能遇到：选错网卡后断网，或订阅 / 脚本覆盖设置。\r\n如遇问题可点击恢复；请保留原配置和 .bak 备份。", 44, 281, -44, 40, 0, 0, 1, modeYAML, "notice")
 	openChooserButton = a("BUTTON", "扫描并选择网卡", 32, 340, 180, 36, bsOwnerDraw|wTab, openChooser, 0, modeYAML, "")
 	a("BUTTON", "恢复 YAML 备份", 224, 340, 150, 36, bsOwnerDraw|wTab, restoreYAML, 0, modeYAML, "")
+	checkEffectiveButton = a("BUTTON", "检查是否生效", 386, 340, 150, 36, bsOwnerDraw|wTab, checkEffective, 0, modeYAML, "")
 	a("STATIC", "执行结果", 32, 406, -32, 20, 0, 0, 1, modeAny, "resultTitle")
 	statusText = a("EDIT", "就绪。请选择上方的一种修复方式。", 32, 431, -32, 40, esReadonly|esMultiline|esAutoVScroll|wScroll, 0, 0, modeAny, "result")
 	a("STATIC", "非官方工具 · 仅在确认后修改所选文件", 16, 496, -16, 22, 0, 0, 1, modeAny, "footer")
@@ -204,12 +210,14 @@ func refreshMainActions() {
 	enable(renameButton, currentMode == modeDLL && strings.EqualFold(base, "wintun.dll") && ready == checked)
 	enable(restoreDLLButton, currentMode == modeDLL && base == suffix)
 	enable(openChooserButton, currentMode == modeYAML && yamlPath != "")
+	enable(checkEffectiveButton, currentMode == modeYAML && yamlPath != "" && activeEffectivenessCheck == nil)
 }
 func setRepairMode(mode repairMode) {
 	if mode != modeDLL && mode != modeYAML {
 		return
 	}
 	if currentMode != mode {
+		stopEffectivenessCheck()
 		stopPathSearch()
 		sendMessage.Call(checkBox, 0x00f1, 0, 0)
 	}
@@ -362,8 +370,10 @@ func mainCommand(id uintptr) {
 		beginPathSearch(modeYAML)
 	case restoreYAML:
 		restoreAction()
+	case checkEffective:
+		beginEffectivenessCheck()
 	case helpID:
-		alert("使用帮助", "两种修复方式独立使用，无需同时执行。\n\nDLL：选择方式后自动查找 OPPO 文件；多处结果时选择真实安装目录，找不到可手动选择。必须先登录 OPPO 互联并保持手机连接，勾选前提后修复。修复与恢复都需要重启电脑。\n\n网卡配置：选择 Clash Verge Rev 或 Clash for Windows，工具自动定位配置，不需要自行找 YAML。先完全退出所选代理软件，再扫描并手动选择联网网卡。最终确认后才备份修改，完成后重新打开客户端。CFW 须先在 Profiles 启用配置，订阅刷新可能重置修改。\n\n不会修改系统 DNS、路由或网卡驱动。", info)
+		alert("使用帮助", "两种修复方式独立使用，无需同时执行。\n\nDLL：选择方式后自动查找 OPPO 文件；多处结果时选择真实安装目录，找不到可手动选择。必须先登录 OPPO 互联并保持手机连接，勾选前提后修复。修复与恢复都需要重启电脑。\n\n网卡配置：选择 Clash Verge Rev 或 Clash for Windows，工具自动定位配置，不需要自行找 YAML。先完全退出所选代理软件，再扫描并手动选择联网网卡。最终确认后才备份修改，完成后重新打开客户端。CFW 须先在 Profiles 启用配置，订阅刷新可能重置修改。默认只显示已连接物理网卡，可点‘显示全部’；修复并重开客户端后可点‘检查是否生效’。\n\n不会修改系统 DNS、路由或网卡驱动。", info)
 	}
 }
 func mainProc(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
@@ -388,6 +398,9 @@ func mainProc(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
 			return 0
 		}
 		mainCommand(id)
+		return 0
+	case wmEffectivenessDone:
+		finishEffectivenessCheck(w)
 		return 0
 	case wmPathsDone:
 		finishPathSearch(w)
@@ -451,6 +464,7 @@ func mainProc(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
 		mainView.layoutMain()
 		return 0
 	case wmDestroy:
+		stopEffectivenessCheck()
 		stopPathSearch()
 		mainView.close()
 		win = 0
@@ -468,7 +482,10 @@ func nicUI() {
 	a := func(class, title string, x, y, w, h int32, style uint32, id uintptr, role int, key string) uintptr {
 		return chooserView.add(class, title, x, y, w, h, style, id, role, modeAny, key)
 	}
-	a("STATIC", "查看已连接的物理网卡，核对默认路由后手动选择。", 24, 56, -24, 24, 0, 0, 1, "")
+	a("STATIC", "优先显示已连接物理网卡，仍需手动选择。", 24, 56, -176, 24, 0, 0, 1, "")
+	nicShowAllButton = a("BUTTON", "显示全部", -164, 52, 140, 32, bsOwnerDraw|wTab, chooseShowAll, 0, "")
+	showAllAdapters = false
+	allAdapters = nil
 	nicList = a("LISTBOX", "", 24, 92, -24, 100, wBorder|wScroll|wTab|lbNotify|0x10|0x40|0x100, chooseListID, 0, "list")
 	nicInfo = a("EDIT", "尚未选择网卡。", 24, 0, -24, 88, esReadonly|esMultiline|wBorder|wScroll|wTab, 0, 0, "details")
 	a("STATIC", "通常选 Wi-Fi / 以太网硬件网卡；默认路由仅作参考。", 24, 0, -24, 23, 0, 0, 1, "hint")
@@ -504,7 +521,7 @@ func nicDetails() {
 	} else if a.HasRoute {
 		routeInfo = "存在 IPv4 默认路由（仅参考）"
 	}
-	text(nicInfo, fmt.Sprintf("接口名称：%s  |  索引：%d\r\n类型：%s  |  状态：%s\r\n设备：%s\r\nMAC：%s  |  %s", a.Name, a.Index, adapterKind(a), adapterState(a), a.Description, a.MAC, routeInfo))
+	text(nicInfo, fmt.Sprintf("接口名称：%s  |  索引：%d\r\n类型：%s  |  状态：%s\r\n设备：%s\r\nMAC：%s  |  %s；网关：%s\r\n%s", a.Name, a.Index, adapterKind(a), adapterState(a), a.Description, a.MAC, routeInfo, a.Gateway, adapterRecommendation(a)))
 }
 func nicScan() {
 	if activeScan != nil {
@@ -513,6 +530,8 @@ func nicScan() {
 	scanSequence++
 	token, owner := scanSequence, chooser
 	adapters = nil
+	allAdapters = nil
+	enable(nicShowAllButton, false)
 	sendMessage.Call(nicList, listReset, 0, 0)
 	text(nicInfo, "扫描期间可随时取消。")
 	text(nicStatus, "正在读取 Windows 网卡…")
@@ -531,24 +550,44 @@ func finishNICScan(token uintptr) {
 		enable(nicRefreshButton, true)
 		if result.err != nil {
 			text(nicInfo, "尚未选择网卡。")
+			enable(nicShowAllButton, true)
 			text(nicStatus, "扫描失败，可重试；未修改文件。")
 			alertFor(chooser, "网卡扫描失败", result.err.Error(), errIcon)
 			return
 		}
-		adapters = result.adapters
-		for _, a := range adapters {
-			extra := ""
-			if a.HasRoute {
-				extra = " · 默认路由"
-			}
-			row := pstr(fmt.Sprintf("%s  |  %s  |  %s%s", a.Name, adapterKind(a), adapterState(a), extra))
-			sendMessage.Call(nicList, listAdd, 0, uintptr(unsafe.Pointer(row)))
-			runtime.KeepAlive(row)
-		}
-		text(nicInfo, "尚未选择网卡。")
-		text(nicStatus, fmt.Sprintf("发现 %d 张网卡，请自行选择。", len(adapters)))
+		allAdapters = markRecommendedAdapters(result.adapters)
+		enable(nicShowAllButton, true)
+		fillNICList()
+
 	default:
 	}
+}
+func fillNICList() {
+	adapters = visibleAdapters(allAdapters, showAllAdapters)
+	sendMessage.Call(nicList, listReset, 0, 0)
+	for _, a := range adapters {
+		extra := ""
+		if a.Recommended {
+			extra = " · 建议选择"
+		} else if a.HasRoute {
+			extra = " · 默认路由"
+		}
+		row := pstr(fmt.Sprintf("%s  |  %s  |  %s%s", a.Name, adapterKind(a), adapterState(a), extra))
+		sendMessage.Call(nicList, listAdd, 0, uintptr(unsafe.Pointer(row)))
+		runtime.KeepAlive(row)
+	}
+	text(nicInfo, "尚未选择网卡。推荐仅供参考，不会自动选中或修改。")
+	enable(nicConfirmButton, false)
+	label := "显示全部"
+	if showAllAdapters {
+		label = "仅显示联网物理网卡"
+	}
+	text(nicShowAllButton, label)
+	status := fmt.Sprintf("显示 %d / %d 张网卡，请手动选择。", len(adapters), len(allAdapters))
+	if len(adapters) == 0 && !showAllAdapters {
+		status = "未找到已连接物理网卡，可点击‘显示全部’查看。"
+	}
+	text(nicStatus, status)
 }
 func nicConfirm() {
 	i := selected()
@@ -587,9 +626,10 @@ func nicConfirm() {
 		text(statusText, "YAML 修复未完成："+detail)
 		return
 	}
+	rememberRepairExpectation(yamlPath, a.Name)
 	text(summaryText, "上次选择："+a.Name+"。再次修改仍需重新选择并确认。")
 	text(statusText, "YAML 已修改；网卡："+a.Name+"\r\n修改前备份："+backup)
-	alertFor(chooser, "修改完成", "已备份到：\n"+backup+"\n\n请重新打开所选代理客户端，使修改生效。CFW 订阅刷新可能覆盖修改。", info)
+	alertFor(chooser, "修改完成", "已备份到：\n"+backup+"\n\n请重新打开所选代理客户端，使修改生效，再点击‘检查是否生效’。CFW 订阅刷新可能覆盖修改。", info)
 	destroyWindow.Call(chooser)
 }
 func chooserProcFn(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
@@ -609,6 +649,11 @@ func chooserProcFn(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
 		case chooseListID:
 			if (w>>16)&0xffff == listChanged {
 				nicDetails()
+			}
+		case chooseShowAll:
+			if activeScan == nil {
+				showAllAdapters = !showAllAdapters
+				fillNICList()
 			}
 		case chooseRefresh:
 			if activeScan == nil {
@@ -663,6 +708,8 @@ func chooserProcFn(h uintptr, m uint32, w uintptr, l unsafe.Pointer) uintptr {
 		nicConfirmButton = 0
 		nicRefreshButton = 0
 		nicCancelButton = 0
+		nicShowAllButton = 0
+		allAdapters = nil
 		return 0
 	}
 	r, _, _ := defaultProc.Call(h, uintptr(m), w, uintptr(l))

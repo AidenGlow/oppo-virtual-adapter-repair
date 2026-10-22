@@ -96,7 +96,7 @@ func TestUICancelBackgroundScanAndIgnoreOldResult(t *testing.T) {
 		c = createChooserWindow()
 		defer destroyWindow.Call(c)
 		activeScan = &adapterScanJob{token: 9002, cancel: func() {}, result: make(chan adapterScanResult, 1)}
-		activeScan.result <- adapterScanResult{adapters: []Adapter{{Name: "Wi-Fi", Hardware: true, HardwareKnown: true}}}
+		activeScan.result <- adapterScanResult{adapters: []Adapter{{Name: "Wi-Fi", Hardware: true, HardwareKnown: true, Status: "Up"}}}
 		finishNICScan(9001)
 		if activeScan == nil || len(adapters) != 0 {
 			t.Fatal("旧窗口结果被使用")
