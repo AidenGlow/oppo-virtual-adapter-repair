@@ -1,97 +1,85 @@
 # OPPO互联占用虚拟网卡修复
 
-## Windows 用户下载提示
+**安装 OPPO 互联后，Clash / Mihomo 开启 TUN 模式就断网、无法联网？** 这是一个面向 Windows 的中文修复工具，将 OPPO 程序文件处理、代理联网网卡配置和备份恢复放在同一个界面里，帮助排查 OPPO 互联与 TUN 虚拟网卡的兼容性冲突。
 
-> **Windows 10 / 11（64 位）用户，推荐直接下载：[Windows EXE（点击下载）](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64.exe)。**
+**Windows 10 / 11 · 64 位 · 单文件 EXE · 支持 Clash Verge Rev 和 Clash for Windows · 当前稳定版 v1.11.0**
+
+## 下载与运行
+
+> **普通 Windows 用户直接下载：[Windows 64 位 EXE（点击下载）](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64.exe)。**
 >
-> 文件名：`oppo-virtual-adapter-repair-windows-amd64.exe`。`amd64` 表示 x64 架构，Intel 和 AMD 的 64 位电脑都适用。
->
-> 下载后双击 EXE，在 Windows 管理员授权窗口点击“是”即可运行。
+> 下载后双击，在 Windows 管理员授权窗口点击“是”即可使用，无需安装 Go 或 Python。`amd64` 表示 x64 架构，Intel 和 AMD 的 64 位电脑都适用。
 
-- **只想使用工具：** 下载上面的 `.exe` 即可。
-- **需要程序、源码和中文说明：** 下载[完整包 ZIP](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64-full.zip)，解压后运行其中的 EXE。
-- **[SHA256-latest.txt](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/SHA256-latest.txt)：** 用于核对下载文件的完整性。
-- **`Source code (zip)` / `Source code (tar.gz)`：** GitHub 自动生成的源码包；直接使用工具请选择 EXE 或完整包。
+- **只使用工具**：下载上面的 `oppo-virtual-adapter-repair-windows-amd64.exe`。
+- **需要程序、源码和中文说明**：下载[完整包 ZIP](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/oppo-virtual-adapter-repair-windows-amd64-full.zip)，解压后运行 EXE。
+- **核对文件完整性**：下载 [SHA256-latest.txt](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest/download/SHA256-latest.txt)。
+- **[稳定版发布页面](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest)**：统一下载入口；页面里的 `Source code (zip)` / `Source code (tar.gz)` 为源码包。
 
-一个用于排查 **OPPO 互联与 Clash / Mihomo TUN 网络冲突**的 Windows 小工具：自动找到需要处理的文件，你选择修复方式，确认后再修改，遇到问题可以恢复。
+## 解决什么问题
 
-**Windows 10 / 11 · 64 位 · 中文界面 · 单文件 EXE · [最新发布版](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest)**
+本工具针对 Windows 电脑上的以下场景：
 
-## v1.11.0 新增功能
+- 安装或启动 OPPO 互联后，Clash / Mihomo 原本可用的 **TUN 模式失效、开启即断网**。
+- OPPO 互联引入额外虚拟网卡，代理的实际联网出口受到干扰，需要明确指定 Wi-Fi 或以太网。
+- 希望通过可确认、可恢复的操作排查冲突，减少手动找 DLL、找 YAML 和改错网卡的问题。
 
-- **只撤销网卡设置：**选择原修复记录，预览并确认后，只还原本工具改过的 `interface-name` 和 `tun.auto-detect-interface`，保留后来修改的节点、规则和其他设置。网卡字段发生冲突时停止，避免覆盖新的选择。
-- **显示文件占用程序：**文件占用失败时，尝试显示 Windows 查询到的程序名称、PID 和服务名，方便保存工作后正常退出。查询失败或超时会明确提示。
-- **保留整份备份恢复：**“恢复 YAML 备份”仍可使用，包括旧版备份。两种修复方式仍由用户自主选择。
+Clash Verge Rev 的[讨论 #6712](https://github.com/clash-verge-rev/clash-verge-rev/discussions/6712)记录了安装 OPPO 互联后新增 `utun8`、TUN 无法联网的案例。代理出口选择或路由受到影响是结合该案例与 Mihomo 机制的解释，具体故障环节应结合本机日志核对。案例依据和两种方式的作用见[原因说明](docs/原因说明.md)。
 
-## 为什么做这个工具
+## 两种修复方式，自主选择
 
-本项目针对的一类问题是：**安装 OPPO 互联后，Clash / Mihomo 原本可用的 TUN 模式一开启就无法联网。**
+两种方式独立使用，无需依次执行。
 
-Clash Verge Rev 的 [讨论 #6712](https://github.com/clash-verge-rev/clash-verge-rev/discussions/6712) 记录了一个案例：安装 OPPO 互联后新增虚拟网卡 `utun8`，开启 TUN 即断网；单独卸载该网卡，重启后又会出现；卸载 OPPO 互联后，网卡移除，TUN 恢复。
-
-**这个案例指向 OPPO 互联引入的虚拟网卡与代理 TUN 共存时的网络冲突。** 为什么会影响整机上网？Mihomo 的 TUN 在启用自动路由时会接收全局流量，处理后的连接仍需通过实际联网网卡发出。结合其[自动选择出口接口的机制](https://wiki.metacubex.one/config/inbound/tun/#auto-detect-interface)，一个合理推断是：新增虚拟网卡影响了出口识别或路由，使流量进入 TUN 后没有从正确的联网接口发出，于是表现为“打开 TUN 就断网”。
-
-截图没有路由表和内核日志，具体冲突环节仍待确认；`utun8` 也是该案例的网卡名，其他电脑可能不同。详细依据、为什么删网卡后会重现，以及两种修复方式的作用见 [原因说明](docs/原因说明.md)。
-
-这个工具把社区排障中的 DLL 改名和代理出口网卡配置放到同一个中文界面里，自动寻找目标文件、显示网卡信息，并提供备份和恢复，减少手动找文件、改错位置和忘记备份的问题。
-
-这两种方法适用于不同情况，可以自行选择其中一种，无需依次执行。它们来自社区排障经验，实际连接效果取决于软件版本和网络环境。本项目是第三方工具。
-
-## 两种方式分别解决什么
-
-| 方式 | 处理什么 | 需要注意 |
+| 方式 | 作用 | 操作前提与完成后处理 |
 | --- | --- | --- |
-| **OPPO DLL 修复** | 将 OPPO 安装目录中 `daemon\wintun.dll` 改名为 `wintun.dll.oppo互联`，用于尝试排查相关组件冲突；支持改回原名 | 必须先登录 OPPO 互联并连接手机。修复和恢复后都要重启电脑；修改后可能无法连接新设备 |
-| **Clash / Mihomo 配置** | 为 TUN 明确指定实际联网的 Wi-Fi / 以太网，避免依赖自动选择出口网卡；自动识别 Clash Verge Rev 和 Clash for Windows 的配置 | 修改前完全退出代理软件；由你选择网卡，完成后重新打开。订阅刷新或脚本可能覆盖设置 |
+| **OPPO DLL 修复** | 自动寻找 OPPO 安装目录中的 `daemon/wintun.dll`，确认后改名以排查相关组件冲突，支持恢复原名 | 先登录 OPPO 互联并保持手机连接；修复和恢复后均需重启电脑。修改可能影响新设备连接 |
+| **Clash / Mihomo 配置** | 自动识别 Clash Verge Rev / Clash for Windows 的配置，由用户选择实际联网网卡，明确 TUN 出口 | 先完全退出代理客户端；确认修改后重新打开。换网络、订阅刷新或扩展脚本可能要求重新核对设置 |
 
-## 下载和使用
+## 如何使用
 
-普通 Windows 用户请使用首页顶部的 **Windows EXE 直接下载**入口。完整包和 SHA256 校验文件见 [最新发布页面](https://github.com/AidenGlow/oppo-virtual-adapter-repair/releases/latest)。
+1. 选择一种修复方式，等待工具定位文件；特殊路径可手动指定。
+2. DLL 方式核对目录并确认手机已连接；配置方式先退出代理软件，再扫描并选择实际联网网卡。默认只显示已连接物理网卡，也可查看全部网卡。
+3. 核对最终确认窗口中的文件路径和修改内容，确认后执行。
+4. 按提示重启电脑或重开代理客户端。配置方式可点击“检查是否生效”，查看运行内核是否采用了设置，再打开常用网页确认联网。
 
-双击 EXE，Windows 会自动弹出管理员授权窗口，确认后进入界面，无需寻找右键菜单。取消授权则程序不启动；修改文件仍需在工具内最终确认。无需安装 Go 或 Python。
+**打开界面、识别配置、扫描网卡和检查是否生效均只读；文件修改需要最终确认。** 工具处理用户选定的文件，保留备份；不安装驱动、不调整系统 DNS、路由表或全局代理。
 
-1. **选择一种修复方式**，等待工具自动找到 OPPO 文件或代理客户端配置。
-2. DLL 方式先核对目录，并勾选手机已连接；配置方式先退出代理客户端，再扫描、选择实际联网的网卡；默认只列已连接物理网卡，需要时点“显示全部”。
-3. 阅读最终确认窗口，核对文件路径和改动，点击“是”后才会修改。
-4. 按提示重启电脑或重新打开代理软件。配置方式可点击“检查是否生效”，再打开常用网页确认联网情况。
+## 遇到问题可恢复
 
-**打开界面、识别配置、扫描 / 筛选网卡及检查是否生效均不会修改配置。取消最终确认也不会修改。** 工具只处理明确选中的文件，保留用户选择和确认；不安装驱动、不修改系统 DNS、路由表或全局代理。
+| 操作 | 恢复范围 |
+| --- | --- |
+| **恢复 DLL** | 将原目录的 `wintun.dll.oppo互联` 恢复为 `wintun.dll`，完成后重启电脑 |
+| **只撤销网卡设置** | 选择原修复记录，预览并确认后，只还原本工具改过的网卡字段，保留后来修改的节点、规则和其他设置；网卡字段有冲突时停止 |
+| **恢复 YAML 备份** | 自动列出当前配置的备份，按时间选择并最终确认后还原整份文件，会覆盖备份之后的修改；恢复前另存当前配置 |
 
-## 出现问题怎样恢复
+请将原 `.bak` 和旁边的 `.bak.oppo-repair.json` 一起保留。删除工具后重新下载仍可恢复；只有 `.bak` 的旧备份可以整份恢复。两种 YAML 恢复入口都保留手动选择文件。
 
-- **DLL：**选择原目录中的 `wintun.dll.oppo互联`，点击“恢复 DLL”，确认后重启电脑。
-- **只撤销网卡设置：**先退出代理客户端，选择对应配置并点击同名按钮。选原修复记录，核对要还原的字段，再最终确认。后来修改的节点、规则和其他设置保留；如网卡字段已被再次修改，工具会停止。
-- **恢复整份 YAML：**“恢复 YAML 备份”仍按时间列出当前配置的备份，确认后还原整份文件，会覆盖备份之后的修改；恢复前另存当前配置。两种入口都保留手动选择文件。
-- **撤销记录：**v1.11.0 修复时，在原 `.bak` 旁新增 `.bak.oppo-repair.json`，请一起保留。旧版备份没有该记录时，使用整份恢复。
-- **删掉工具后仍可恢复：**重新下载工具即可，前提是原目录中的已改名 DLL，或原 YAML 及旁边的 `.bak` 还在。仅撤销网卡还需保留对应的 `.oppo-repair.json`；请保留这些文件和所在目录。
+## 常见问题
 
-详细步骤见 [使用说明](docs/使用说明.md)。
+### OPPO互联导致VPN失效，这个工具适用吗？
+
+如果你说的“VPN 失效”是 **Windows 安装 OPPO 互联后，Clash / Mihomo 的 TUN 模式无法联网**，可以使用本工具排查。当前支持 Clash Verge Rev 和 Clash for Windows 的配置识别；OPPO 手机上的 VPN 应用问题属于另一类场景。
+
+### 修复失败时怎样处理？
+
+工具区分权限不足、文件被占用和路径失效，并给出下一步操作。占用相关失败会尝试显示程序名称、PID 和服务名，方便保存工作后正常退出；查询失败或未识别到程序时保留排查指引。详细步骤见[使用说明](docs/使用说明.md)。
+
+### 恢复会覆盖后来改过的节点和规则吗？
+
+“只撤销网卡设置”保留当前节点和规则；“恢复 YAML 备份”还原整份配置。请按需要选择恢复范围，并保存原备份及对应撤销记录。
 
 ## 界面示例
 
-以下截图使用临时样本配置；生效结果为测试样本：
+以下截图使用样本配置和网卡信息：
 
-![Clash / Mihomo 配置界面](docs/images/proxy-sample.png)
+![Clash / Mihomo 配置界面示意](docs/images/proxy-sample.png)
 
 ![简洁网卡列表（样本）](docs/images/nic-simple-sample.png)
 
-继续支持简洁网卡列表和“检查是否生效”。检查只读取所选客户端的本机状态，不自动重载配置、关闭客户端或发起外网测速。详见[使用说明](docs/使用说明.md#检查修复是否生效)。
+## 验证与说明
 
-## 测试到哪一步了
+当前稳定版已通过 **82 项顶层测试、31 个模糊测试种子，0 失败**；1 项符号链接测试因系统权限不足跳过。临时文件验证了修复、保留后改节点和规则的局部撤销、整份恢复及真实文件占用程序识别。测试范围和复现记录见 [TEST_RESULTS.md](TEST_RESULTS.md)。
 
-- **v1.11.0：82 项顶层测试、31 个模糊测试种子通过，0 失败；1 项符号链接测试因权限不足跳过。** 临时文件完整验证修复后修改节点和规则、只撤销网卡、保护备份和整份恢复；真实 Windows 文件占用进程识别通过。覆盖率 76.3%，静态检查及 Windows x64 构建通过。
-
-- **v1.10.0：68 项业务回归、31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过。** 网卡筛选、真实本机 HTTP / 命名管道、只读生效检查、后台取消和临时文件修复恢复通过。
-
-- v1.9.2：54 项业务回归、31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过。新增真实临时文件占用、访问拒绝、路径缺失及原生备份窗口指引检查通过。
-
-- v1.9.1：50 项业务回归和 31 个模糊测试种子通过，0 失败，1 项权限相关测试跳过；发布 EXE 的原生资源核对及 Windows 要求提权（错误 740）检查通过。
-
-- v1.9 回归：**50 项测试、31 个模糊测试种子通过，0 失败**；1 项符号链接测试因系统权限不足跳过。`go vet` 和离线 Windows x64 构建通过。
-- 额外用临时 YAML 完整跑通 **修复 → 自动查找备份 → 列表选择 → 最终确认 → 恢复**，包含实际文件写入；恢复后的字节和 SHA256 与原文件一致，恢复前保护备份也核对通过。
-- 真实手机连接、真实代理配置修改后的网络效果，以及全部 Windows / 客户端版本尚未联调验证。
-
-记录和复现方法见 [测试结果](TEST_RESULTS.md)。
+本项目是第三方工具。实际连接效果取决于软件版本和网络环境；具体操作前提及恢复条件见[使用说明](docs/使用说明.md)，版本改动记录在 [CHANGELOG](CHANGELOG.md)。
 
 ## 从源码运行和编译
 
