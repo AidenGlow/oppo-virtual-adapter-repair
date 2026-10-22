@@ -1,9 +1,0 @@
-{
-  "Version": "v1.9.1",
-  "TopLevelPass": 50,
-  "TopLevelSkip": 1,
-  "FuzzSeedPass": 31,
-  "Failed": 0,
-  "VetPassed": true,
-  "TestResourceLevel": "asInvoker（普通权限业务回归；发布资源在独立 Windows 提权检查中验证）"
-}

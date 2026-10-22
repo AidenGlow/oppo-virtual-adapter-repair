@@ -28,7 +28,7 @@
 | 原生窗口 | 缺失 YAML 时，备份窗口显示重新识别 / 手动指定指引，恢复按钮禁用，未生成文件 |
 | 构建与资源 | go vet、Go 1.27.2 离线 Windows AMD64 GUI 构建通过；内嵌 requireAdministrator / PerMonitorV2 与源码一致，普通权限直接启动返回 740 |
 
-记录见 [test-summary.json](verification/v1.9.2/test-summary.json) 和 [elevation.json](verification/v1.9.2/elevation.json)。业务回归在隔离源码副本中使用 asInvoker 测试资源；正式源码与 EXE 保留 requireAdministrator。没有点击 UAC 授权窗口、操作真实 OPPO 文件或代理配置，也未执行重启。本轮专门验证失败提示，未新增真实设备和网络联调结果。
+记录见 [test-summary.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9.2/test-summary.json) 和 [elevation.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9.2/elevation.json)。业务回归在隔离源码副本中使用 asInvoker 测试资源；正式源码与 EXE 保留 requireAdministrator。没有点击 UAC 授权窗口、操作真实 OPPO 文件或代理配置，也未执行重启。本轮专门验证失败提示，未新增真实设备和网络联调结果。
 
 错误码依据：[Microsoft Windows 系统错误码](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-)。只依据错误链分类，不通过错误文字猜测，也不自动关闭程序或调整文件权限。
 
@@ -41,7 +41,7 @@
 | 发布 EXE 资源 | 通过 Windows 原生资源 API 读取；与源码 manifest 字节一致，requireAdministrator、uiAccess=false，PerMonitorV2 保留 |
 | Windows 实际启动规则 | 普通权限直接 CreateProcess 返回 ERROR_ELEVATION_REQUIRED（740），确认系统已识别管理员启动要求 |
 
-业务回归在普通权限的 asInvoker 测试资源下执行；随后生成 requireAdministrator 发布资源，构建最终 EXE 并独立执行 Windows 启动检查。除版本常量外，Go 业务代码未改动。记录见 [test-summary.json](verification/v1.9.1/test-summary.json) 和 [elevation.json](verification/v1.9.1/elevation.json)。本轮没有代替用户点击系统 UAC 授权窗口，也未操作真实 OPPO 文件、代理配置或执行重启。
+业务回归在普通权限的 asInvoker 测试资源下执行；随后生成 requireAdministrator 发布资源，构建最终 EXE 并独立执行 Windows 启动检查。除版本常量外，Go 业务代码未改动。记录见 [test-summary.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9.1/test-summary.json) 和 [elevation.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9.1/elevation.json)。本轮没有代替用户点击系统 UAC 授权窗口，也未操作真实 OPPO 文件、代理配置或执行重启。
 
 可在普通权限 PowerShell 中复现发布检查（仅开发验证需要 Python）：
 
@@ -68,7 +68,7 @@ python source/tools/check_elevation.py '.\OPPO互联连接修复工具_v1.9.1.ex
 | 实际 EXE 短测 | 两种方式切换、自动识别、常驻高亮、调整窗口、备份空态与手动入口、60 次消息响应和正常关闭通过 |
 | 既有配置 | 实际 EXE 短测前后，5 份本地客户端配置 / 索引的 SHA256 保持一致 |
 
-完整回归摘要见 [test-summary.json](verification/v1.9/test-summary.json)。含个人路径的本机截图和原始环境日志未纳入公开仓库。
+完整回归摘要见 [test-summary.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9/test-summary.json)。含个人路径的本机截图和原始环境日志未纳入公开仓库。
 
 ## 临时配置的完整闭环
 
@@ -86,7 +86,7 @@ python source/tools/check_elevation.py '.\OPPO互联连接修复工具_v1.9.1.ex
 2fa5d2ec37284bfa03861763656feba39869bdc0eb54b724a7a91ad5416a8784
 ```
 
-专项摘要见 [result.json](verification/v1.9/roundtrip/result.json)，测试源码见 [roundtrip_integration_windows_test.go](verification/v1.9/roundtrip/roundtrip_integration_windows_test.go)。该测试与公开产品源码分开保存，便于核对发布源码未改动。
+专项摘要见 [result.json](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9/roundtrip/result.json)，测试源码见 [roundtrip_integration_windows_test.go](https://github.com/AidenGlow/oppo-virtual-adapter-repair/blob/v1.9.2/verification/v1.9/roundtrip/roundtrip_integration_windows_test.go)。该测试与公开产品源码分开保存，便于核对发布源码未改动。
 
 要复现该专项测试，可在仓库根目录使用 PowerShell 将测试文件临时复制到源码目录；仅操作测试自己创建的临时文件：
 
